@@ -1,6 +1,9 @@
 #ifndef __NFC_UICR_RK_H
 #define __NFC_UICR_RK_H
 
+// Github: https://github.com/rickkas7/NFC_UICR_RK
+// License: MIT
+
 #include "Particle.h"
 
 /**
@@ -22,6 +25,7 @@
  * 
  * This calls only does anything on nRF52840 devices, but compiles on all platforms. The enable()
  * and disable() functions are no-op, and checkEnableNFC() always returns true on other platforms.
+ * 
  */
 class NFC_UICR_RK {
 public:

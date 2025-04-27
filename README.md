@@ -6,23 +6,31 @@ Particle Gen 3 devices (nRF52840 MCU) have the capability of supporting NFC tag 
 
 | Device      | Platform        | NFC Enabled | NFC Disabled |
 | :---------- | :-------------- | :---------: | :----------: |
-| Argon       | `argon`         | &check;     |              |
-| Boron       | `boron`         | &check;     |              |
-| B-SoM       | `bsom`, `b5som` | &check;     |              |
-| E404X       | `esomx`         |             | &check;      |
-| Electron 2  | `electron2`     | &check;     |              |
-| Monitor One | `tracker`       |             | &check;      |
-| Tracker One | `tracker`       | &check;     |              |
+| Argon       | `argon`         | x           |              |
+| Boron       | `boron`         | x           |              |
+| B-SoM       | `bsom`, `b5som` | x           |              |
+| E404X       | `esomx`         |             | x            |
+| Electron 2  | `electron2`     | x           |              |
+| Monitor One | `tracker`       |             | x            |
+| Tracker One | `tracker`       | x           |              |
 
-The two devices that have NFC disabled from the factory (E-SoM and Monitor One) have it disabled because the pins are needed for additional GPIO. You also have the ability to do this on devices that have it enabled from the factory.
+The two devices that have NFC disabled from the factory (E-SoM and Monitor One) have it disabled because the pins are needed for additional GPIO. 
+
+You also have the ability to do this on devices that have it enabled from the factory. Reusing NFC pins as GPIO really only makes sense on the B-SoM because the NFC pins are included on M.2 connector. On the Argon, Boron, and Electron 2 the NFC pins are only available on a U.FL connector. 
+
+- Github: https://github.com/rickkas7/NFC_UICR_RK
+- License: MIT
+- Full browsable API documentation available [here](https://rickkas7.github.io/NFC_UICR_RK/index.html) as well as in the docs directory 
 
 ## Why is this process needed?
 
 There's a diode that kicks in when the voltage differential between NFC1 and NFC2 is greater than 2.0V. This is designed to protect the MCU from induced voltage from the NFC coils, but obviously would have bad side effects if using as GPIO.
 
-This protection diode can be disabled by setting a register in the the UICR bytes (nRF configuration bytes). These are extraordinarily persistent and will not be reset by flashing application firmware, Device OS, bootloader, or SoftDevice.
+This protection diode can be disabled by setting a register in the the UICR bytes (nRF52 configuration bytes). These are  persistent and will not be reset by flashing application firmware, Device OS, bootloader, or SoftDevice.
 
 Normally you would change the UICR bytes using a SWD/JTAG programmer, but you can also do it from application firmware. One important caveat is that the MCU must be reset after updating the UICR bytes.
+
+The UICR bytes are reset using chip erase on a SWD programmer. The device restore hex files except those for the Tracker all reset the UICR bytes to their default values. Device Restore USB does not reset the UICR bytes.
 
 ## Using SWD/JTAG
 
@@ -75,7 +83,7 @@ void setup() {
     // won't attempt to connect to the cloud before doing this!
     NFC_UICR_RK::disable();
 
-
+    // Must be after checking the UICR bytes
     Particle.connect();
 }
 
@@ -83,12 +91,14 @@ void loop() {
 
 }
 ```
+
 Of note:
 
 - Be sure you use `SYSTEM_MODE(SEMI_AUTOMATIC)` so the device will not attempt to connect to the cloud before checking the UICR bytes.
 - `SYSTEM_THREAD(ENABLED)` is always recommended in all firmware.
 - Add a call to `NFC_UICR_RK::disable()` (or enable) at the beginning of `setup()`.
 - Do not enable BLE before updating the UICR bytes.
+- It's safe to call `Particle.connect()` and time after checking the UICR bytes.
 
 If the UICR bytes are already in the correct enable/disable state, the function returns immediately.
 
