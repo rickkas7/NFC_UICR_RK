@@ -6,27 +6,12 @@
 
 
 // [static]
-void NFC_UICR_RK::disable() {
+void NFC_UICR_RK::disableNFC() {
     if (!checkEnableNFC()) {
         // Already disabled
         return;
     }
-    setEnableAndReset(false);
-}
 
-// [static]
-void NFC_UICR_RK::enable() {
-    if (checkEnableNFC()) {
-        // Already enabled
-        return;
-    }
-
-    setEnableAndReset(true);
-}
-
-// [static]
-void NFC_UICR_RK::setEnableAndReset(bool enableNFC) {
-    // Disable SoftDevice if enabled
     uint8_t softdevice_enabled = 0;
     sd_softdevice_is_enabled(&softdevice_enabled);
     if (softdevice_enabled) {
@@ -41,14 +26,8 @@ void NFC_UICR_RK::setEnableAndReset(bool enableNFC) {
             // Wait for NVMC to become ready
         }
 
-        if (enableNFC) {
-            // Set the NFC protection bit to configure pins as NFC
-            NRF_UICR->NFCPINS |= UICR_NFCPINS_PROTECT_Msk;
-        }
-        else {
-            // Clear NFC protection bits to configure pins as GPIO
-            NRF_UICR->NFCPINS &= ~UICR_NFCPINS_PROTECT_Msk;
-        }
+        // Clear NFC protection bits to configure pins as GPIO
+        NRF_UICR->NFCPINS &= ~UICR_NFCPINS_PROTECT_Msk;
 
         // Wait until the operation is complete
         while (NRF_NVMC->READY == NVMC_READY_READY_Busy) {
@@ -66,7 +45,6 @@ void NFC_UICR_RK::setEnableAndReset(bool enableNFC) {
     System.reset();
 }
 
-
 // [static]
 bool NFC_UICR_RK::checkEnableNFC() {
 
@@ -76,19 +54,9 @@ bool NFC_UICR_RK::checkEnableNFC() {
 #else // HAL_PLATFORM_NRF52840
 
 // [static]
-void NFC_UICR_RK::disable() {
+void NFC_UICR_RK::disableNFC() {
     return;
 }
-
-// [static]
-void NFC_UICR_RK::enable() {
-    return;
-}
-
-// [static]
-void NFC_UICR_RK::setEnableAndReset(bool enableNFC) {
-}
-
 
 // [static]
 bool NFC_UICR_RK::checkEnableNFC() {

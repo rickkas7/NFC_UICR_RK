@@ -10,10 +10,10 @@ SYSTEM_THREAD(ENABLED);
 SerialLogHandler logHandler(LOG_LEVEL_INFO);
 
 void setup() {
-    // Checks the NFC status in the UICR bytes. If enabled, disables it and resets the device.
+    // Checks the NFC status in the UICR bytes and disables it if enabled.
     // You should use this with SYSTEM_THREAD(ENABLED) and SEMI_AUTOMATIC mode so the device
     // won't attempt to connect to the cloud before doing this!
-    NFC_UICR_RK::disable();
+    NFC_UICR_RK::disableNFC();
 
 
     Particle.connect();
