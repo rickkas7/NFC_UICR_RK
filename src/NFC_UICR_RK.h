@@ -7,7 +7,7 @@
 #include "Particle.h"
 
 /**
- * @brief Class for updating the nRF52840 UICR bytes to enable or disable NFC
+ * @brief Class for updating the nRF52840 UICR bytes to disable NFC
  * 
  * You will typically call NFC_UICR_RK::disableNFC() to disable NFC on devices that have it enabled but you
  * want to use the pins as GPIO. The E404X and Monitor One already have it disabled from the factory.

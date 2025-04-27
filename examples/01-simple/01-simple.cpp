@@ -15,7 +15,7 @@ void setup() {
     // won't attempt to connect to the cloud before doing this!
     NFC_UICR_RK::disableNFC();
 
-
+    // Can be any time after disableNFC() returns
     Particle.connect();
 }
 
