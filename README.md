@@ -130,3 +130,4 @@ Note that you cannot turn NFC back on without chip erasing the device using a SW
 ### 0.0.1 (2025-04-28)
 
 - Initial version
+
