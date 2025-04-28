@@ -125,3 +125,8 @@ One potential issue is that if the updating failed, the device would enter a rol
 
 Note that you cannot turn NFC back on without chip erasing the device using a SWD/JTAG programmer, so make sure you don't turn it off if you may need to use it again and you don't have the appropriate SWD/JTAG programming hardware!
 
+## Release history
+
+### 0.0.1 (2025-04-28)
+
+- Initial version
