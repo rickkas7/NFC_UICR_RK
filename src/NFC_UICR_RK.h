@@ -23,11 +23,10 @@
  * after enable() or disable() will never be executed.
  * 
  * There is no enableNFC()! This is because in order to reenable NFC mode, you must chip erase the
- * device and flash both the uicr and enter system flash image to the device.
+ * device and flash both the UICR and enter system flash image to the device.
  * 
  * This calls only does anything on nRF52840 devices, but compiles on all platforms. The
  * disableNFC() function is a no-op, and checkEnableNFC() always returns false on other platforms.
- * 
  */
 class NFC_UICR_RK {
 public:
@@ -37,6 +36,8 @@ public:
      * If it was enabled, the state will be set to disabled and the device will reboot.
      * 
      * If NFC was already disabled, the function will return immediately so your code can continue executing.
+     * 
+     * Note: You can only reenable NFC by chip erase and reprogram with a SWD programmer!
      */
     static void disableNFC();
 

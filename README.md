@@ -26,25 +26,24 @@ You also have the ability to do this on devices that have it enabled from the fa
 
 There's a diode that kicks in when the voltage differential between NFC1 and NFC2 is greater than 2.0V. This is designed to protect the MCU from induced voltage from the NFC coils, but obviously would have bad side effects if using as GPIO.
 
-This protection diode can be disabled by setting a register in the the UICR bytes (nRF52 configuration bytes). These are  persistent and will not be reset by flashing application firmware, Device OS, bootloader, or SoftDevice.
+This protection diode can be disabled by setting a register in the the UICR bytes (nRF52 configuration data). These are  persistent and will not be reset by flashing application firmware, Device OS, bootloader, or SoftDevice.
 
 Normally you would change the UICR bytes using a SWD/JTAG programmer, but you can also do it from application firmware. One important caveat is that the MCU must be reset after updating the UICR bytes.
 
-You can only set the UICR byte bits from 1 to 0 in application firmware or only by flashing the UICR values! In order to 
-set a 0 value (NFC disabled) back to 1 (NFC enabled), you need to chip erase the device which reset the UICR back to 1 values. It will also erase the bootloader, soft devies, Device OS, and application firmware.
+You can only set the UICR byte bits from 1 to 0 in application firmware or by SWD! In order to 
+set a 0 value (NFC disabled) back to 1 (NFC enabled), you need to chip erase the device which reset the UICR back to 1 values. It will also erase the bootloader, soft devies, Device OS, and application firmware, and other UICR settings.
 
 Device Restore USB does not affect the UICR bytes.
+
+The Device Restore JTAG .hex files for platforms other than Tracker include the default UICR bytes.
 
 ## Using SWD/JTAG
 
 ### SWD programming using hex files
 
-Included in this Github are two files:
+Included in this Github is the file `uicr_nfc_disable.hex`
 
-- `uicr_nfc_disable.hex`
-- `uicr.hex`
-
-You can flash these using a SWD/JTAG programmer to update the settings. Reset the device after updating.
+You can flash this using a SWD/JTAG programmer to update the settings. Reset the device after updating.
 
 If you are using a CMSIS/DAP debugger you should be able to drag and drop `uicr_nfc_disable.hex` on the debugger DAPLINK volume.
 
@@ -60,10 +59,12 @@ To restore the UICR bytes:
 
 ```
 nfrjprog -f NRF52 --program uicr.hex --chiperase
-nfrjprog -f NRF52 --program device-restore-image.hex
+nfrjprog -f NRF52 --program device-restore.hex
 ```
 
-You cannot restore UICR bytes with a CMSIS/DAP debugger drag-and-drop but you may be able to with OpenOCD.
+You cannot restore UICR bytes with a CMSIS/DAP debugger drag-and-drop. 
+
+The OpenOCD `nrf5 mass_erase` option can be used, along with the the device restore JTAG .hex file.
 
 ### SWD programming manually
 
@@ -118,10 +119,9 @@ Of note:
 
 If the UICR bytes indicate that NFC is already disabled, the function returns immediately.
 
-If the UICR bytes need updating, they will be updated and the device reset, so the lines after it will not be executed until after reset.
+If the UICR bytes need updating, they will be updated and the device reset, so the lines after `NFC_UICR_RK::disableNFC()` will not be executed until after reset.
 
 One potential issue is that if the updating failed, the device would enter a rolling reboot and would never fully boot. This is unlikely, but cannot be ruled out as a remote possibility. Once the UICR bytes are set once, this should never be an issue.
 
-Note that you cannot turn NFC back on without chip erasing the device using a SWD/JTAG programmer, so make sure you don't turn it off if you may need to use it again and you don't have the appropriate hardware!
-
+Note that you cannot turn NFC back on without chip erasing the device using a SWD/JTAG programmer, so make sure you don't turn it off if you may need to use it again and you don't have the appropriate SWD/JTAG programming hardware!
 
